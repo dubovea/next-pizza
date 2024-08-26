@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { categories, _ingredients, products } from './constants';
-import { prisma } from '../../next-pizza-main/prisma/prisma-client';
+import { prisma } from '../../next-pizza/prisma/prisma-client';
 import { hashSync } from 'bcrypt';
 
 const randomDecimalNumber = (min: number, max: number) => {

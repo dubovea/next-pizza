@@ -18,9 +18,17 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@prisma/client": ["./node_modules/@prisma/client"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "@types/*.d.ts"],
+  "include": [
+    "prisma/**/*.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "@types/*.d.ts"
+  ],
   "exclude": ["node_modules"]
 }
