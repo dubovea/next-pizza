@@ -1,12 +1,32 @@
-import { Container, Filters, ProductsGroupList, Title, TopBar } from "@/shared/components/shared";
+import { prisma } from "@/prisma/prisma-client";
+import {
+  Container,
+  Filters,
+  ProductsGroupList,
+  Title,
+  TopBar,
+} from "@/shared/components/shared";
 
-export default function Home() {
+export default async function Home() {
+  const categories = await prisma.category.findMany({
+    include: {
+      products: {
+        include: {
+          ingredients: true,
+          items: true,
+        },
+      },
+    },
+  });
+
+  const topBarCategories = categories.filter((o) => o.products.length);
+
   return (
     <>
       <Container className="mt-10">
         <Title text="Все пиццы" size="lg" className="font-extrabold" />
       </Container>
-      <TopBar />
+      <TopBar categories={topBarCategories} />
       <Container className="mt-10 pb-14">
         <div className="flex gap-[60px]">
           {/* Фильтры */}
@@ -17,62 +37,17 @@ export default function Home() {
           {/* Список товаров */}
           <div className="flex-1">
             <div className="flex flex-col gap-16">
-              <ProductsGroupList
-                title="Завтрак"
-                items={[
-                  {
-                    id: 1,
-                    name: "Пицца",
-                    imageUrl:
-                      "https://media.dodostatic.net/image/r:584x584/11EF438E93884BFEBFE79D11095AE2D4.avif",
-                    items: [
-                      {
-                        price: 550,
-                      },
-                    ],
-                  },
-                  {
-                    id: 2,
-                    name: "Пицца 2",
-                    imageUrl:
-                      "https://media.dodostatic.net/image/r:584x584/11EF438E93884BFEBFE79D11095AE2D4.avif",
-                    items: [
-                      {
-                        price: 3550,
-                      },
-                    ],
-                  },
-                ]}
-                categoryId={1}
-              />
-              <ProductsGroupList
-                title="Обед"
-                items={[
-                  {
-                    id: 1,
-                    name: "Пицца",
-                    imageUrl:
-                      "https://media.dodostatic.net/image/r:584x584/11EF438E93884BFEBFE79D11095AE2D4.avif",
-                    items: [
-                      {
-                        price: 550,
-                      },
-                    ],
-                  },
-                  {
-                    id: 2,
-                    name: "Пицца 2",
-                    imageUrl:
-                      "https://media.dodostatic.net/image/r:584x584/11EF438E93884BFEBFE79D11095AE2D4.avif",
-                    items: [
-                      {
-                        price: 3550,
-                      },
-                    ],
-                  },
-                ]}
-                categoryId={2}
-              />
+              {categories.map(
+                (category) =>
+                  category.products.length && (
+                    <ProductsGroupList
+                      key={category.id}
+                      title={category.name}
+                      categoryId={category.id}
+                      items={category.products}
+                    />
+                  )
+              )}
             </div>
           </div>
         </div>
