@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/shared/lib/utils";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Ingredient, ProductItem } from "@prisma/client";
 import {
   GroupVariants,
@@ -11,14 +11,12 @@ import {
 } from "@/shared/components/shared";
 import { Button } from "@/shared/components/ui";
 import {
-  mapPizzaType,
   PizzaSize,
-  pizzaSizes,
   PizzaType,
   pizzaTypes,
 } from "@/shared/contants/pizza";
-import { useSet } from "react-use";
-import { calcTotalPizzaPrice } from "@/shared/lib";
+import { getPizzaDetails } from "@/shared/lib";
+import { usePizzaOptions } from "@/shared/hooks";
 interface Props {
   imageUrl: string;
   name: string;
@@ -38,41 +36,24 @@ export const ChoosePizzaForm: React.FC<Props> = ({
   onSubmit,
   className,
 }) => {
-  const [size, setSize] = useState<PizzaSize>(30);
-  const [type, setType] = useState<PizzaType>(1);
-  const textDetaills = `${size} см, ${mapPizzaType[type]} пицца`;
+  const {
+    size,
+    type,
+    selectedIngredients,
+    availablePizzas,
+    setSize,
+    setType,
+    addIngredient,
+  } = usePizzaOptions(items, pizzaTypes);
 
-  const [selectedIngredients, { toggle: addIngredient }] = useSet(
-    new Set<number>([])
-  );
-
-  const totalPrice = calcTotalPizzaPrice(
+  const { textDetaills, totalPrice } = getPizzaDetails(
     type,
     size,
     items,
     ingredients,
     selectedIngredients
   );
-
-  const filteredPizzasByType = items.filter((item) => item.pizzaType === type);
-  const availablePizzas = pizzaSizes.map((item) => ({
-    name: item.name,
-    value: item.value,
-    disabled: !filteredPizzasByType.some(
-      (pizza) => Number(pizza.size) === Number(item.value)
-    ),
-  }));
-
-  useEffect(() => {
-    const isAvailableSize = availablePizzas?.find(
-      (o) => Number(o.value) === size && !o.disabled
-    );
-    const availableSize = availablePizzas?.find((o) => !o.disabled);
-    if (!isAvailableSize && availableSize) {
-      setSize(+availableSize.value as PizzaSize);
-    }
-  }, [type]);
-
+  
   return (
     <div className={cn(className, "flex flex-1")}>
       <PizzaImage imageUrl={imageUrl} size={size} />
