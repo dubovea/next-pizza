@@ -1,53 +1,53 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { Variant } from "../components/shared/group-variants";
-import { PizzaSize, PizzaType } from "../contants/pizza";
 import { useSet } from "react-use";
 import { getAvailablePizzaSizes } from "../lib";
 import { ProductItem } from "@prisma/client";
+import { PizzaSize, PizzaType } from "../contants/pizza";
 
 interface ReturnProps {
   size: PizzaSize;
   type: PizzaType;
   selectedIngredients: Set<number>;
-  availablePizzas: Variant[];
+  availableSizes: Variant[];
+  currentItemId?: number;
   setSize: (size: PizzaSize) => void;
-  setType: (type: PizzaType) => void;
+  setType: (size: PizzaType) => void;
   addIngredient: (id: number) => void;
 }
-export const usePizzaOptions = (
-  items: ProductItem[],
-  availableSizes: Variant[]
-): ReturnProps => {
-  const [size, setSize] = useState<PizzaSize>(30);
-  const [type, setType] = useState<PizzaType>(1);
+
+export const usePizzaOptions = (items: ProductItem[]): ReturnProps => {
+  const [size, setSize] = React.useState<PizzaSize>(20);
+  const [type, setType] = React.useState<PizzaType>(1);
   const [selectedIngredients, { toggle: addIngredient }] = useSet(
     new Set<number>([])
   );
-  const availablePizzas = getAvailablePizzaSizes(type, items);
 
-  useEffect(() => {
+  const availableSizes = getAvailablePizzaSizes(type, items);
+
+  const currentItemId = items.find(
+    (item) => item.pizzaType === type && item.size === size
+  )?.id;
+
+  React.useEffect(() => {
     const isAvailableSize = availableSizes?.find(
-      (o) => Number(o.value) === size && !o.disabled
+      (item) => Number(item.value) === size && !item.disabled
     );
-    const availableSize = availableSizes?.find((o) => !o.disabled);
+    const availableSize = availableSizes?.find((item) => !item.disabled);
+
     if (!isAvailableSize && availableSize) {
-      setSize(+availableSize.value as PizzaSize);
+      setSize(Number(availableSize.value) as PizzaSize);
     }
   }, [type]);
 
-  console.log({
-    size,
-    type,
-    selectedIngredients,
-    availablePizzas,
-  });
   return {
     size,
     type,
     selectedIngredients,
-    availablePizzas,
-    setType,
+    availableSizes,
+    currentItemId,
     setSize,
+    setType,
     addIngredient,
   };
 };

@@ -10,11 +10,7 @@ import {
   Title,
 } from "@/shared/components/shared";
 import { Button } from "@/shared/components/ui";
-import {
-  PizzaSize,
-  PizzaType,
-  pizzaTypes,
-} from "@/shared/contants/pizza";
+import { PizzaSize, PizzaType, pizzaTypes } from "@/shared/contants/pizza";
 import { getPizzaDetails } from "@/shared/lib";
 import { usePizzaOptions } from "@/shared/hooks";
 interface Props {
@@ -40,11 +36,11 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     size,
     type,
     selectedIngredients,
-    availablePizzas,
+    availableSizes,
     setSize,
     setType,
     addIngredient,
-  } = usePizzaOptions(items, pizzaTypes);
+  } = usePizzaOptions(items);
 
   const { textDetaills, totalPrice } = getPizzaDetails(
     type,
@@ -53,7 +49,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
     ingredients,
     selectedIngredients
   );
-  
+
   return (
     <div className={cn(className, "flex flex-1")}>
       <PizzaImage imageUrl={imageUrl} size={size} />
@@ -64,7 +60,7 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
         <div className="flex flex-col gap-4 mt-5">
           <GroupVariants
-            items={availablePizzas}
+            items={availableSizes}
             value={`${size}`}
             onClick={(value) => setSize(+value as PizzaSize)}
           />
