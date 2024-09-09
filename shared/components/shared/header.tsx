@@ -35,13 +35,15 @@ export const Header: React.FC<Props> = ({ className }) => {
 
         {/* Правая часть */}
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="flex items-center gap-1">
-            <User size={16} />
-            Войти
-          </Button>
-        </div>
-        <div>
-          <CartButton />
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="flex items-center gap-1">
+              <User size={16} />
+              Войти
+            </Button>
+          </div>
+          <div>
+            <CartButton />
+          </div>
         </div>
       </Container>
     </header>

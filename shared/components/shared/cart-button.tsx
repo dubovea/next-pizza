@@ -12,11 +12,10 @@ interface Props {
 }
 
 export const CartButton: React.FC<Props> = ({ className }) => {
-  const loading = false;
-
-  const [totalAmount, items] = useCartStore((state) => [
+  const [totalAmount, items, loading] = useCartStore((state) => [
     state.totalAmount,
     state.items,
+    state.loading,
   ]);
   return (
     <CartDrawer>
