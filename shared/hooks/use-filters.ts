@@ -1,6 +1,6 @@
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useSet } from "react-use";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export interface PriceProps {
   priceFrom?: number;
@@ -28,7 +28,6 @@ interface ReturnProps extends QueryFilters {
 }
 
 export const useFilters = (): ReturnProps => {
-  const router = useRouter();
   const searchParams = useSearchParams() as unknown as Map<
     keyof FilterProps,
     string
@@ -61,14 +60,17 @@ export const useFilters = (): ReturnProps => {
     setPrices((prev) => ({ ...prev, [name]: value }));
   };
 
-  return {
-    sizes,
-    types,
-    selectedIngredients,
-    prices,
-    setIngredients: toggleIngredients,
-    setPrices: updatePrice,
-    setSizes: toggleSizes,
-    setTypes: toggleTypes,
-  };
+  return useMemo(
+    () => ({
+      sizes,
+      types,
+      selectedIngredients,
+      prices,
+      setIngredients: toggleIngredients,
+      setPrices: updatePrice,
+      setSizes: toggleSizes,
+      setTypes: toggleTypes,
+    }),
+    [prices, sizes, types, selectedIngredients]
+  );
 };

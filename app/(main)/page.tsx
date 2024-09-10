@@ -6,18 +6,16 @@ import {
   Title,
   TopBar,
 } from "@/shared/components/shared";
+import { findPizzas } from "@/shared/lib";
+import { GetSearchParams } from "@/shared/lib/find-pizzas";
+import { Suspense } from "react";
 
-export default async function Home() {
-  const categories = await prisma.category.findMany({
-    include: {
-      products: {
-        include: {
-          ingredients: true,
-          items: true,
-        },
-      },
-    },
-  });
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: GetSearchParams;
+}) {
+  const categories = await findPizzas(searchParams);
 
   const topBarCategories = categories.filter((o) => o.products.length);
 
@@ -31,7 +29,9 @@ export default async function Home() {
         <div className="flex gap-[60px]">
           {/* Фильтры */}
           <div className="w-[250px]">
-            <Filters />
+            <Suspense>
+              <Filters />
+            </Suspense>
           </div>
 
           {/* Список товаров */}
@@ -39,7 +39,7 @@ export default async function Home() {
             <div className="flex flex-col gap-16">
               {categories.map(
                 (category) =>
-                  category.products.length && (
+                  !!category.products.length && (
                     <ProductsGroupList
                       key={category.id}
                       title={category.name}

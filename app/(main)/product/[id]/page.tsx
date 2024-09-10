@@ -1,6 +1,5 @@
 import { prisma } from "@/prisma/prisma-client";
 import {
-  ChoosePizzaForm,
   Container,
   ProductForm,
 } from "@/shared/components/shared";

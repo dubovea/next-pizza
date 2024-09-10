@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Title } from "./title";
 import { Input } from "../ui/input";
 import { RangeSlider } from "./range-slider";
