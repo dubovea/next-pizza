@@ -1,8 +1,11 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useCart } from "@/shared/hooks";
+import React from "react";
+import { checkoutFormSchema, CheckoutFormValues } from "@/shared/contants";
 import {
   CheckoutAddressForm,
   CheckoutCart,
@@ -10,10 +13,7 @@ import {
   CheckoutSidebar,
   Container,
   Title,
-} from "@/shared/components/shared";
-import { useCart } from "@/shared/hooks";
-import React from "react";
-import { checkoutFormSchema, CheckoutFormValues } from "@/shared/contants";
+} from "@/shared/components";
 
 export default function CheckoutPage() {
   const { loading, totalAmount, updateItemQuantity, removeCartItem, items } =
@@ -31,6 +31,10 @@ export default function CheckoutPage() {
     },
   });
 
+  const onSubmit: SubmitHandler<CheckoutFormValues> = (data) => {
+    console.log(data);
+  };
+
   const onClickCountButton = (
     id: number,
     quantity: number,
@@ -46,21 +50,30 @@ export default function CheckoutPage() {
         text="Оформление заказа"
         className="font-extrabold mb-8 text-[36px]"
       />
-      <div className="flex gap-10">
-        <div className="flex flex-col gap-10 flex-1 mb-20">
-          <CheckoutCart
-            onClickCountButton={onClickCountButton}
-            removeCartItem={removeCartItem}
-            items={items}
-            loading={loading}
-          />
-          <CheckoutPersonalForm />
-          <CheckoutAddressForm />
-        </div>
-        <div className="w-[450px]">
-          <CheckoutSidebar totalAmount={totalAmount} loading={loading} />
-        </div>
-      </div>
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex gap-10">
+            <div className="flex flex-col gap-10 flex-1 mb-20">
+              <CheckoutCart
+                onClickCountButton={onClickCountButton}
+                removeCartItem={removeCartItem}
+                items={items}
+                loading={loading}
+              />
+              <CheckoutPersonalForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
+              />
+
+              <CheckoutAddressForm
+                className={loading ? "opacity-40 pointer-events-none" : ""}
+              />
+            </div>
+            <div className="w-[450px]">
+              <CheckoutSidebar totalAmount={totalAmount} loading={loading} />
+            </div>
+          </div>
+        </form>
+      </FormProvider>
     </Container>
   );
 }
