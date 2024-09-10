@@ -16,7 +16,7 @@ import {
 } from "@/shared/components";
 
 export default function CheckoutPage() {
-  const { loading, totalAmount, updateItemQuantity, removeCartItem, items } =
+  const { loading, initialLoading, totalAmount, updateItemQuantity, removeCartItem, items } =
     useCart();
 
   const form = useForm<CheckoutFormValues>({
@@ -58,7 +58,7 @@ export default function CheckoutPage() {
                 onClickCountButton={onClickCountButton}
                 removeCartItem={removeCartItem}
                 items={items}
-                loading={loading}
+                initialLoading={initialLoading}
               />
               <CheckoutPersonalForm
                 className={loading ? "opacity-40 pointer-events-none" : ""}

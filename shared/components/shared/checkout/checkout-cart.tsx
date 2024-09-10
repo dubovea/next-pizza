@@ -14,7 +14,7 @@ interface Props {
     type: "plus" | "minus"
   ) => void;
   removeCartItem: (id: number) => void;
-  loading?: boolean;
+  initialLoading?: boolean;
   className?: string;
 }
 
@@ -22,13 +22,13 @@ export const CheckoutCart: React.FC<Props> = ({
   items,
   onClickCountButton,
   removeCartItem,
-  loading,
+  initialLoading,
   className,
 }) => {
   return (
     <WhiteBlock title="1. Корзина" className={className}>
       <div className="flex flex-col gap-5">
-        {loading
+        {initialLoading
           ? [...Array(4)].map((_, index) => (
               <CheckoutItemSkeleton key={index} />
             ))
