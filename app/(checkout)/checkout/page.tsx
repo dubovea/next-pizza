@@ -4,7 +4,7 @@ import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useCart } from "@/shared/hooks";
-import React from "react";
+import React, { useState } from "react";
 import { checkoutFormSchema, CheckoutFormValues } from "@/shared/contants";
 import {
   CheckoutAddressForm,
@@ -14,10 +14,19 @@ import {
   Container,
   Title,
 } from "@/shared/components";
+import { createOrder } from "@/app/actions";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
-  const { loading, initialLoading, totalAmount, updateItemQuantity, removeCartItem, items } =
-    useCart();
+  const [submitting, setSubmitting] = useState(false);
+  const {
+    loading,
+    initialLoading,
+    totalAmount,
+    updateItemQuantity,
+    removeCartItem,
+    items,
+  } = useCart();
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -31,8 +40,24 @@ export default function CheckoutPage() {
     },
   });
 
-  const onSubmit: SubmitHandler<CheckoutFormValues> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<CheckoutFormValues> = async (data) => {
+    try {
+      setSubmitting(true);
+      const url = await createOrder(data);
+
+      toast.success("Заказ успешно создан! Переход на оплату...", {
+        icon: "🎉",
+      });
+      if (url) {
+        location.href = url;
+      }
+    } catch (err) {
+      setSubmitting(false);
+      console.log(err);
+      toast.error("Не удалось создать заказ", {
+        icon: "🚫",
+      });
+    }
   };
 
   const onClickCountButton = (
@@ -69,7 +94,10 @@ export default function CheckoutPage() {
               />
             </div>
             <div className="w-[450px]">
-              <CheckoutSidebar totalAmount={totalAmount} loading={loading} />
+              <CheckoutSidebar
+                totalAmount={totalAmount}
+                loading={loading || submitting}
+              />
             </div>
           </div>
         </form>
