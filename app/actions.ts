@@ -5,7 +5,7 @@ import { prisma } from "@/prisma/prisma-client";
 import { comment } from "postcss";
 import { OrderStatus } from "@prisma/client";
 import { cookies } from "next/headers";
-import { sendEmail } from "@/shared/lib";
+import { createPayment, sendEmail } from "@/shared/lib";
 import { OrderPayTemplate } from "@/shared/components/shared/email-templates/order-pay";
 
 export async function createOrder(data: CheckoutFormValues) {
@@ -74,15 +74,38 @@ export async function createOrder(data: CheckoutFormValues) {
       },
     });
 
+    const paymentData = await createPayment({
+      description: `Оплата заказа ${order.id}`,
+      orderId: order.id,
+      amount: order.totalAmount,
+    });
+
+    if (!paymentData) {
+      throw new Error("Payment data not found");
+    }
+
+    await prisma.order.update({
+      where: {
+        id: order.id,
+      },
+      data: {
+        paymentId: paymentData.id,
+      },
+    });
+
+    const paymentUrl = paymentData.confirmation.confirmation_url;
+    
     await sendEmail(
       data.email,
       `Next Pizza / Оплатите заказ ${order.id}`,
       OrderPayTemplate({
         orderNumber: order.id,
         totalAmount: order.totalAmount,
-        paymentUrl: `https://next-pizza.vercel.app/orders/${order.id}`,
+        paymentUrl: paymentUrl,
       })
     );
+
+    return paymentUrl;
   } catch (err) {
     console.log("[Create Order] Server error", err);
   }
