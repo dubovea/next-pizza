@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { ProfileButton } from "./profile-button";
 import { AuthModal } from "./modals";
+import router from "next/router";
 
 interface Props {
   hasSearch?: boolean;
@@ -24,14 +25,24 @@ export const Header: React.FC<Props> = ({
 }) => {
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const searchParams = useSearchParams();
-  const succededPaid = useRef(false);
+  const initialLoaded = useRef(false);
 
   useEffect(() => {
-    if (!succededPaid.current && searchParams.has("paid")) {
+    let message = "";
+    if (!initialLoaded.current && searchParams.has("paid")) {
+      message = "Заказ успешно оплачен!";
+    }
+    if (!initialLoaded.current && searchParams.has("verify")) {
+      message = "Почта подтверждена!";
+    }
+    initialLoaded.current = true;
+    if (message) {
       setTimeout(() => {
-        toast.success("Заказ успешно оплачен!");
+        toast.success(message, {
+          duration: 3000,
+        });
+        router.replace("/");
       });
-      succededPaid.current = true;
     }
   }, []);
 
